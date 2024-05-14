@@ -6,8 +6,9 @@ require (
 	github.com/inercia/kubernetes-e2e-utils v0.0.0-20220706100256-fb4c9cc55aa4
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
 	github.com/spf13/cobra v1.4.0
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/crypto v0.19.0
+	golang.org/x/sync v0.6.0
+	google.golang.org/grpc v1.63.2
 	k8s.io/api v0.23.0
 	k8s.io/apimachinery v0.23.0
 	k8s.io/cli-runtime v0.23.0

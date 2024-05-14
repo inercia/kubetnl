@@ -174,10 +174,10 @@ func ParseMapping(rawMapping string) (Mapping, error) {
 // ip, target port number (without protocol) and the container port (if
 // specified, including protocol).
 //
-// 	splitRawMapping("8080") -> "", "", "8080"
-// 	splitRawMapping("8080/tcp") -> "", "", "8080/tcp"
-// 	splitRawMapping("417:417/udp") -> "", "417", "417/tcp"
-// 	splitRawMapping("127.0.0.1:80:8080/tcp") -> "127.0.0.1", "80", "8080/tcp"
+//	splitRawMapping("8080") -> "", "", "8080"
+//	splitRawMapping("8080/tcp") -> "", "", "8080/tcp"
+//	splitRawMapping("417:417/udp") -> "", "417", "417/tcp"
+//	splitRawMapping("127.0.0.1:80:8080/tcp") -> "127.0.0.1", "80", "8080/tcp"
 //
 // Nothing is validated by splitRawMapping.
 func splitRawMapping(rawMapping string) (string, string, string) {
@@ -200,13 +200,13 @@ func splitRawMapping(rawMapping string) (string, string, string) {
 // splitParts splits up a raw port string into its parts. Returns the port number
 // and the protocol.
 //
-// 	splitRawPort("8080") -> "8080", "tcp"
-// 	splitRawPort("8080/udp") -> "8080", "udp",
-// 	splitRawPort("8080/") -> "8080", "tcp"
+//	splitRawPort("8080") -> "8080", "tcp"
+//	splitRawPort("8080/udp") -> "8080", "udp",
+//	splitRawPort("8080/") -> "8080", "tcp"
 //
-// 	splitRawPort("") -> "", ""
-// 	splitRawPort("/udp") -> "", "udp"
-// 	splitRawPort("8080/udp/8081") -> "8080", "udp"
+//	splitRawPort("") -> "", ""
+//	splitRawPort("/udp") -> "", "udp"
+//	splitRawPort("8080/udp/8081") -> "8080", "udp"
 //
 // Nothing is validated by splitRawMapping.
 func splitRawPort(rawPort string) (string, string) {
