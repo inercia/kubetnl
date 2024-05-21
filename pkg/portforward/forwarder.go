@@ -2,6 +2,7 @@
 package portforward
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -40,6 +41,10 @@ func (f *Forwarder) String() string {
 // logged using f.ErrorLog. If a Close causes the forwarder to stop and Open to
 // return, nil will be returned.
 func (f *Forwarder) Open(l net.Listener) error {
+	if InterfaceIsNil(l) {
+		return fmt.Errorf("nil listener")
+	}
+	
 	f.lis = &onceCloseListener{Listener: l}
 	defer l.Close()
 
