@@ -55,7 +55,7 @@ func NewExposedGRPCServer(config ExposedGRPCServerConfig) *ExposedGRPCServer {
 //
 // All the traffic that is sent to the exposed service at the given port will be
 // redirected and processed by the handler function.
-func (e *ExposedGRPCServer) Run(ctx context.Context, server *grpc.Server, lis net.Listener) (chan struct{}, error) {
+func (e *ExposedGRPCServer) Start(ctx context.Context, server *grpc.Server, lis net.Listener) (chan struct{}, error) {
 	e.grpcServer = server
 
 	ctx, cancel := context.WithCancel(ctx)

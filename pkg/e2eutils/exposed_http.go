@@ -64,7 +64,7 @@ func NewExposedHTTPServer(config ExposedHTTPServerConfig) *ExposedHTTPServer {
 //
 // All the traffic that is sent to the exposed service at the given port will be
 // redirected and processed by the handler function.
-func (e *ExposedHTTPServer) Run(ctx context.Context, handler http.Handler) (chan struct{}, error) {
+func (e *ExposedHTTPServer) Start(ctx context.Context, handler http.Handler) (chan struct{}, error) {
 	e.httpServer = httptest.NewServer(handler)
 
 	klog.Infof("Local HTTP server started at %s", e.httpServer.URL)

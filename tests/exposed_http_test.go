@@ -109,7 +109,7 @@ func TestServiceInCluster(t *testing.T) {
 			klog.Info("Starting both the kube->here and here->kube tunnels")
 
 			klog.Infof("Starting kube->here tunnel...")
-			if _, err := kubeToHere.Run(ctx, handler); err != nil {
+			if _, err := kubeToHere.Start(ctx, handler); err != nil {
 				t.Fatal(err)
 			}
 			defer kubeToHere.Stop()
