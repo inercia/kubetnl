@@ -1,17 +1,17 @@
 PLATFORMS   := linux/amd64 windows/amd64 darwin/amd64
 
-VERSION      = $(shell git describe HEAD --tags --abbrev=0)
-GIT_COMMIT   = $(shell git rev-parse HEAD)
+VERSION      = $(shell git describe HEAD --tags --abbrev=0 2>/dev/null)
+GIT_COMMIT   = $(shell git rev-parse HEAD 2>/dev/null)
 LD_FLAGS     = -ldflags="-X 'github.com/inercia/kubetnl/pkg/version.gitCommit=$(GIT_COMMIT)'"
 
 MAIN         = ./main.go
-SRCS         = $(shell find . -name '*.go' ! -path './tests/*')
-ALL_SRCS     = $(shell find . -name '*.go')
-SHS          = $(shell find . -name '*.sh')
+SRCS         = $(shell find . -name '*.go' ! -path './tests/*' 2>/dev/null)
+ALL_SRCS     = $(shell find . -name '*.go' 2>/dev/null)
+SHS          = $(shell find . -name '*.sh' 2>/dev/null)
 
 GO          ?= go
-GOOS        ?= $(shell go env GOOS)
-GOARCH      ?= $(shell go env GOARCH)
+GOOS        ?= $(shell go env GOOS 2>/dev/null)
+GOARCH      ?= $(shell go env GOARCH 2>/dev/null)
 GOEXE       ?= kubetnl
 GOFLAGS     ?=
 
@@ -51,6 +51,7 @@ bin/%: $(SRCS)
 	go build ${LD_FLAGS} -o 'bin/kubetnl-$(VERSION)_$(GOOS)-$(GOARCH)/$(GOEXE)' ${MAIN}
 
 exe: bin/kubetnl-$(VERSION)_$(GOOS)-$(GOARCH)/$(GOEXE) ## Build the default executable
+build: exe
 
 windows-amd64: bin/kubetnl-$(VERSION)_windows-amd64/kubetnl.exe
 linux-amd64:   bin/kubetnl-$(VERSION)_linux-amd64/kubetnl
@@ -94,5 +95,6 @@ fmt: format
 #########################################
 
 PHONY: tests
-tests: $(ALL_SRCS) ## Run all the tests
+tests: run-tests
+run-tests: $(ALL_SRCS) ## Run all the tests
 	go test ./tests -test.v
