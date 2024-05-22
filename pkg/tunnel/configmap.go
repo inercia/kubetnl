@@ -14,7 +14,11 @@ const (
 	scriptContents = `
 #!/bin/bash
 # set -e
+
+echo ">>> Changing sshd_config before SSHD is started..."
+
 if [[ ! -z "${PORT}" ]]; then
+  echo ">>> Setting port to ${PORT}"
   echo "Port ${PORT}\n" >> /etc/ssh/sshd_config
 fi
 
@@ -22,8 +26,10 @@ sed -i 's/#AllowAgentForwarding yes/AllowAgentForwarding yes/g' /etc/ssh/sshd_co
 sed -i 's/AllowTcpForwarding no/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
 sed -i 's/GatewayPorts no/GatewayPorts yes/g' /etc/ssh/sshd_config
 sed -i 's/X11Forwarding no/X11Forwarding yes/g' /etc/ssh/sshd_config
+
+echo ">>> Configuration done..."
 `
-	scriptDirectory = "/custom-cont-init.d"
+	scriptDirectory = "/etc/cont-init.d"
 )
 
 func getConfigMap(name string) *corev1.ConfigMap {

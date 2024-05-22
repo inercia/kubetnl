@@ -33,6 +33,8 @@ func getServiceAccount(name string) *corev1.ServiceAccount {
 }
 
 func getPod(name, image string, sshPort int, ports []corev1.ContainerPort) *corev1.Pod {
+	ptrInt32 := func(i int32) *int32 { return &i }
+
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
@@ -79,6 +81,7 @@ func getPod(name, image string, sshPort int, ports []corev1.ContainerPort) *core
 							{
 								Key:  scriptFilename,
 								Path: scriptFilename,
+								Mode: ptrInt32(0o755),
 							},
 						},
 					},
