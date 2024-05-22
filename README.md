@@ -1,21 +1,40 @@
 # kubetnl
 
-kubetnl (*kube tunnel*) is a command line utility to tunnel TCP connections from within a Kubernetes to a cluster-external endpoint, e.g. to your local machine.
+kubetnl (*kube tunnel*) is library (and command line utility) to tunnel
+TCP connections from within a Kubernetes to a cluster-external endpoint,
+e.g. to your local machine.
+
 You can think of it as doing the opposite of `kubectl port-forward`.
+
+For example, it can be used for:
+
+* starting a local HTTP server in your program
+* exposing it in a Kubernetes service
+* sending all the traffic from that Kubernetes service to your local HTTP server
+
+and doing all of that programatically.
 
 ## Demo
 
 ![kubetnl-demo.gif](https://gist.githubusercontent.com/fischor/6d175f01db8ded817d5fc72dcd37811e/raw/d5a708324354b49fa5dd15c47f9fd52287c394e1/kubetnl.gif)
 
-## How does it work
+## How does the command line tool work?
 
-When a new tunnel with `kubetnl tunnel myservice 8080:8080 9090:9090 5.5.5.5:80:8888` is created, kubetnl will create a Service and a Pod with name "myservice" in your cluster.
-The pod will expose port 8080, 9090, 8888 and another random port for the tunnel.
-The service will target port 8080, 9090 and 8888 of the pod.
+When a new tunnel with `kubetnl tunnel myservice 8080:8080 9090:9090 5.5.5.5:80:8888`
+is created, kubetnl will create a `Service` and a `Pod` with name `myservice` in
+your cluster.
 
-Once the pod is running, a connection to the pods exposed port for tunneling is established via pod portforwarding.
-Using the established connection to the pod, kubetnl opens a tunnel on the pod causing it to forward any incoming connections on port 8080, 9090 and 8888 to the kubetnl binary.
-From the kubetnl binary, the connections are then forwarded to their specified target endpoints.
+The `Pod` will expose port `8080`, `9090`, `8888` and another random port for
+the tunnel. The `Service` will target port `8080`, `9090` and `8888` of the Pod.
+
+Once the `Pod` is running, a connection to the `Pod`'s exposed port for tunneling
+is established via pod portforwarding.
+
+Using the established connection to the pod, `kubetnl` opens a tunnel on the `Pod`
+causing it to forward any incoming connections on port `8080`, `9090` and `8888` to
+the kubetnl binary.
+
+From the `kubetnl` binary, the connections are then forwarded to their specified target endpoints.
 
 ## Installation
 
@@ -27,7 +46,8 @@ If you have Go installed, you can simply run
 go install github.com/inercia/kubetnl@latest
 ```
 
-to install the latest version of kubetnl. 
+to install the latest version of `kubetnl`. 
+
 You can replace latest with the version tag you want to install, e.g. `v0.1.1`.
 
 ### Install by picking a relase
@@ -36,9 +56,8 @@ Go the the [release section](https://github.com/inercia/kubetnl/releases) and pi
 
 ## Prerequisities
 
-For kubetnl to work, you need to have privilidges the create services and pods and to do portforwarding on pods. 
+For `kubetnl` to work, you need to have privilidges the create services and pods and to do portforwarding on pods. 
 Your cluster must also be able to pull the docker.io/fischor/kubetnl-server image. 
-
 
 ## Commands
 
@@ -91,17 +110,20 @@ Examples:
   kubetnl tunnel myservice 8080:80 9090:90
 
   # Tunnel to local port 80 from myservice.<namespace>.svc.cluster.local:80 using version 0.1.0 of the kubetnl server
-image.
-  kubetnl tunnel --image docker.io/fischor/kubetnl-server:0.1.0 myservice 80:80
 
-Options:
-      --image='docker.io/fischor/kubetnl-server:0.1.0': The container image thats get deployed to serve a SSH server
 
 Usage:
   kubetnl tunnel SERVICE_NAME TARGET_ADDR:SERVICE_PORT [...[TARGET_ADDR:SERVICE_PORT]] [flags] [options]
 
 Use "kubetnl options" for a list of global command-line options (applies to all commands).
 ```
+
+## Using the library
+
+`kubetnl` can also be used for exposing your local services in a Kubernetes cluster programmatically.
+
+Take a look at the [exposed_http_test.go](tests/exposed_http_test.go) example
+for more information.
 
 # Alternatives
 
