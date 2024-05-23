@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -109,13 +110,37 @@ func (o *Tunnel) CreatePod(ctx context.Context) error {
 	klog.V(2).Infof("Creating ServiceAccount %q...", o.Name)
 	o.serviceAccount, err = o.serviceAccountClient.Create(ctx, o.serviceAccount, metav1.CreateOptions{})
 	if err != nil {
-		if !errors.IsAlreadyExists(err) {
+		if errors.IsAlreadyExists(err) {
+			klog.V(2).Infof("error creating ServiceAccount %q: %v (IGNORED)", o.serviceAccount.Name, err)
+		} else {
 			return fmt.Errorf("error creating ServiceAccount %q: %v", o.serviceAccount.Name, err)
 		}
 	}
 
 	o.podClient = o.ClientSet.CoreV1().Pods(o.Namespace)
 	o.pod = getPod(o.Name, o.Image, o.RemoteSSHPort, ports)
+
+	klog.V(2).Infof("Deleting any previous Pod %q...", o.Name)
+
+	// make sure we delete any previous pod with the same name
+	// as we do not want to re-use existing Pods.
+	if _, err := o.podClient.Get(ctx, o.pod.GetName(), metav1.GetOptions{}); err == nil {
+		klog.V(2).Infof("Deleting existing Pod %q...", o.Name)
+		if err := o.podClient.Delete(ctx, o.pod.GetName(), metav1.DeleteOptions{}); err != nil {
+			return fmt.Errorf("error deleting previous Pod: %v", err)
+		}
+
+		// wait until the Pod is gone
+		if err := wait.PollImmediate(1*time.Second, 5*time.Minute, func() (bool, error) {
+			_, err := o.podClient.Get(ctx, o.pod.GetName(), metav1.GetOptions{})
+			if errors.IsNotFound(err) {
+				return true, nil
+			}
+			return false, nil
+		}); err != nil {
+			return fmt.Errorf("error waiting for Pod to be deleted: %v", err)
+		}
+	}
 
 	klog.V(2).Infof("Creating Pod %q...", o.Name)
 	o.pod, err = o.podClient.Create(ctx, o.pod, metav1.CreateOptions{})

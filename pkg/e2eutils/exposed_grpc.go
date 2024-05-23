@@ -2,6 +2,7 @@ package e2eutils
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"strconv"
@@ -56,6 +57,9 @@ func NewExposedGRPCServer(config ExposedGRPCServerConfig) *ExposedGRPCServer {
 // All the traffic that is sent to the exposed service at the given port will be
 // redirected and processed by the handler function.
 func (e *ExposedGRPCServer) Start(ctx context.Context, server *grpc.Server, lis net.Listener) (chan struct{}, error) {
+	if server == nil {
+		return nil, fmt.Errorf("empty server")
+	}
 	e.grpcServer = server
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -136,8 +140,12 @@ func (e *ExposedGRPCServer) Start(ctx context.Context, server *grpc.Server, lis 
 	return e.kubeToHereReady, nil
 }
 
-func (e *ExposedGRPCServer) Ready() <-chan struct{} {
+func (e ExposedGRPCServer) Ready() <-chan struct{} {
 	return e.kubeToHereReady
+}
+
+func (e ExposedGRPCServer) Wait() {
+	<-e.Ready()
 }
 
 func (e *ExposedGRPCServer) Stop() error {

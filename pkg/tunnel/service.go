@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/klog/v2"
@@ -45,7 +46,11 @@ func (o *Tunnel) CreateService(ctx context.Context) error {
 	klog.V(3).Infof("Creating Service %q...", o.Name)
 	o.service, err = o.serviceClient.Create(ctx, o.service, metav1.CreateOptions{})
 	if err != nil {
-		return fmt.Errorf("error creating Service: %v", err)
+		if errors.IsAlreadyExists(err) {
+			klog.V(3).Infof("error creating Service: %v (IGNORED)", err)
+		} else {
+			return fmt.Errorf("error creating Service: %v", err)
+		}
 	}
 
 	klog.V(3).Infof("Created Service %q.", o.service.GetObjectMeta().GetName())

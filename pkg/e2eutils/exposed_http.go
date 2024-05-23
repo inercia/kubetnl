@@ -138,8 +138,12 @@ func (e *ExposedHTTPServer) Start(ctx context.Context, handler http.Handler) (ch
 	return e.kubeToHereReady, nil
 }
 
-func (e *ExposedHTTPServer) Ready() <-chan struct{} {
+func (e ExposedHTTPServer) Ready() <-chan struct{} {
 	return e.kubeToHereReady
+}
+
+func (e ExposedHTTPServer) Wait() {
+	<-e.Ready()
 }
 
 func (e *ExposedHTTPServer) Stop() error {

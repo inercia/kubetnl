@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 )
@@ -55,7 +56,11 @@ func (o *Tunnel) CreateConfigMap(ctx context.Context) error {
 	klog.V(3).Infof("Creating ConfigMap %q...", o.Name)
 	o.configMap, err = o.configMapClient.Create(ctx, o.configMap, metav1.CreateOptions{})
 	if err != nil {
-		return fmt.Errorf("error creating configMap: %v", err)
+		if errors.IsAlreadyExists(err) {
+			klog.V(3).Infof("error creating ConfigMap: %v (IGNORED)", err)
+		} else {
+			return fmt.Errorf("error creating ConfigMap: %v", err)
+		}
 	}
 
 	klog.V(3).Infof("Created ConfigMap %q.", o.configMap.GetObjectMeta().GetName())
